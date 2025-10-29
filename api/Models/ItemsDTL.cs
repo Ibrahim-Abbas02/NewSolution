@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore; // أضف هذا
+using Microsoft.EntityFrameworkCore; 
 
 namespace api.Models
 {

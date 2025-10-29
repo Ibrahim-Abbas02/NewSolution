@@ -48,6 +48,21 @@ namespace InvoiceAPI.Controllers
 			}
 		}
 
+		[HttpPut("{id}")]
+		public async Task<IActionResult> Update(int id, [FromBody] InvoiceHDR invoice)
+		{
+			try
+			{
+				var result = await _service.SaveInvoiceAsync(invoice);
+				return Ok(result);
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(new { message = ex.Message });
+			}
+		}
+
+
 		[HttpDelete("{id}")]
 		public async Task<IActionResult> Delete(int id)
 		{

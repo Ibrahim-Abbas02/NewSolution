@@ -1,5 +1,5 @@
 ﻿using api.Models;
-using Microsoft.EntityFrameworkCore; // أضف هذا
+using Microsoft.EntityFrameworkCore; 
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -31,6 +31,9 @@ namespace api.Models
 		public decimal Total { get; set; }
 
 		public DateTime CreatedDate { get; set; } = DateTime.Now;
+
+		[Timestamp]
+		public byte[] RowVersion { get; set; }
 
 		public List<ItemsDTL> Items { get; set; } = new();
 	}
