@@ -33,6 +33,7 @@ namespace api.Models
 		public DateTime CreatedDate { get; set; } = DateTime.Now;
 
 		[Timestamp]
+		[System.Text.Json.Serialization.JsonIgnore]
 		public byte[] RowVersion { get; set; }
 
 		public List<ItemsDTL> Items { get; set; } = new();

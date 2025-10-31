@@ -37,16 +37,17 @@ namespace InvoiceAPI.Controllers
 		[HttpPost]
 		public async Task<IActionResult> Create([FromBody] InvoiceHDR invoice)
 		{
-			try
+			if (!ModelState.IsValid)
 			{
-				var result = await _service.SaveInvoiceAsync(invoice);
-				return Ok(result);
+				return BadRequest(ModelState);
 			}
-			catch (Exception ex)
-			{
-				return BadRequest(new { message = ex.Message });
-			}
+
+			_context.Invoices.Add(invoice);
+			await _context.SaveChangesAsync();
+			return Ok(invoice);
 		}
+
+
 
 		[HttpPut("{id}")]
 		public async Task<IActionResult> Update(int id, [FromBody] InvoiceHDR invoice)

@@ -13,7 +13,7 @@ namespace api.Models
 		public int InvoiceId { get; set; }
 
 		[MaxLength(100)]
-		public string ItemName { get; set; } = string.Empty;
+		public string ItemName { get; set; } 
 
 		public int Quantity { get; set; }
 
