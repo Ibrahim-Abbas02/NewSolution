@@ -1,16 +1,15 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { InvoiceFormComponent } from './components/invoice-form/invoice-form';
 import { RouterOutlet } from '@angular/router';
-import { InvoiceFormComponent } from "./components/invoice-form/invoice-form";
-import { HttpClientModule } from '@angular/common/http';
-
+import { InvoiceListComponent } from './components/invoice-list/invoice-list';
 @Component({
   selector: 'app-root',
-  standalone : true,
-  imports: [RouterOutlet, InvoiceFormComponent,HttpClientModule],
+  standalone: true,
+  imports: [RouterOutlet],
   templateUrl: './app.html',
-  styleUrls: ['./app.css'],
-
+  styleUrls: ['./app.css']
 })
-export class App {
-  protected readonly title = signal('Invoice-UI');
+export class AppComponent {
+  title = 'Invoice Management';
 }

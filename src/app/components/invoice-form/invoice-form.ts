@@ -1,49 +1,81 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { InvoiceService, InvoiceHDR, ItemsDTL } from '../../services/invoice-service';
+import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { Invoice } from '../../models/invoice.model';
-import { InvoiceService } from '../../services/invoice';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatOptionModule } from '@angular/material/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatTableModule } from '@angular/material/table';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-
+import { ReactiveFormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 @Component({
   selector: 'app-invoice-form',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatOptionModule,
-    MatButtonModule,
-    MatTableModule
-  ],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './invoice-form.html',
+  styleUrls: ['./invoice-form.css']
 })
-export class InvoiceFormComponent {
-  invoice: Invoice = {
-    invoiceNo: '',
-    customerName: '',
-    invoiceType: 'Cash',
-    discount: 0,
-    vat: 0,
-    items: [{ itemName: '', quantity: 1, unitPrice: 0 }]
-  };
+export class InvoiceFormComponent implements OnInit {
+  invoiceForm!: FormGroup;
+  invoiceId?: number;
+  errorMsg: string = '';
 
-  displayedColumns: string[] = ['itemName', 'quantity', 'unitPrice', 'total'];
+  constructor(
+    private fb: FormBuilder,
+    private invoiceService: InvoiceService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {}
 
-  constructor(private service: InvoiceService) {}
+  ngOnInit(): void {
+    this.invoiceId = +this.route.snapshot.paramMap.get('id')!;
+    this.initForm();
 
-  saveInvoice() {
-    this.service.create(this.invoice).subscribe({
-      next: () => alert('Invoice saved successfully!'),
-      error: err => alert(err.error.message)
+    if(this.invoiceId) {
+      this.invoiceService.getInvoice(this.invoiceId).subscribe(
+        inv => this.invoiceForm.patchValue(inv),
+        err => this.errorMsg = err.message
+      );
+    }
+  }
+
+  initForm(): void {
+    this.invoiceForm = this.fb.group({
+      invoiceNo: ['', [Validators.required, Validators.maxLength(20)]],
+      customerName: ['', Validators.maxLength(150)],
+      invoiceType: ['Cash', Validators.required],
+      discount: [0, Validators.min(0)],
+      vat: [0, Validators.min(0)],
+      items: this.fb.array([])
     });
+  }
+
+  get items(): FormArray {
+    return this.invoiceForm.get('items') as FormArray;
+  }
+
+  addItem(): void {
+    this.items.push(this.fb.group({
+      itemName: ['', Validators.required],
+      quantity: [1, Validators.min(1)],
+      unitPrice: [0, Validators.min(0)]
+    }));
+  }
+
+  removeItem(index: number): void {
+    this.items.removeAt(index);
+  }
+
+  saveInvoice(): void {
+    const invoice: InvoiceHDR = this.invoiceForm.value;
+
+    if(this.invoiceId) {
+      this.invoiceService.updateInvoice(this.invoiceId, invoice).subscribe(
+        () => this.router.navigate(['/invoice-list']),
+        err => this.errorMsg = err.error?.message || err.message
+      );
+    } else {
+      this.invoiceService.createInvoice(invoice).subscribe(
+        () => this.router.navigate(['/invoice-list']),
+        err => this.errorMsg = err.error?.message || err.message
+      );
+    }
   }
 }
